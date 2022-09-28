@@ -63,16 +63,8 @@ O2146	2021-12-04 22:55:54	2021-12-04 23:30:54	2021-12-04 23:26:54	4	D240	R633	C1
 Solution
 
 select
-year_month,
-late_orders,
-num_orders,
-late_orders*1.0/num_orders as percent_late_orders
-from
-(
-select
-to_char(actual_delivery_time,'YYYY-MM') as year_month,
-count(*) as num_orders, 
-sum(case when (actual_delivery_time - predicted_delivery_time) > interval '20 minutes' then 1 else 0 end) as late_orders
+to_char(order_placed_time,'YYYY-MM') as year_month,
+--sum(case when (actual_delivery_time - predicted_delivery_time) >= interval '20 minutes' then 1 else 0 end)*1.0 / count(*) *100
+sum(case when extract(minute from (actual_delivery_time - predicted_delivery_time)) > 20 then 1 else 0 end)*1.0 / count(*) *100
 from delivery_orders
 group by 1
-) a
